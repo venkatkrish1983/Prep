@@ -1,108 +1,104 @@
-//Note : to implement userdefined exception override what() and destructor
-//throw (exception type) in function param
+//custom exception class for stack Empty exception
 #include <exception>
 #include <iostream>
-
 using namespace std;
+
 class stackEmptyException:public exception
 {
-        public:
-                const char* what() const throw()
-                {
-                        return "stack Full";
-                }
-                ~stackEmptyException()
-                {
-                }
+	public:
+		const char* what() const noexcept
+		{
+			return "stack empty";
+		}
+
+};
+
+//interface class 
+template <class T>
+class stackADT
+{
+	public:
+		virtual void push(T elem) = 0;
+		virtual void pop() throw (stackEmptyException) = 0;	
+		virtual T top() const throw (stackEmptyException) = 0;
+		//helper functions
+		virtual bool isEmpty() const = 0;
+		virtual int size() const = 0;
 };
 
 template <class T>
-class stackADT //interface class
+struct node
 {
-        public:
-                virtual void push(T val)=0;
-                virtual void pop() throw (stackEmptyException) =0;
-                virtual T Top() const throw (stackEmptyException) =0;
-                virtual int Size() const =0;
-                virtual bool empty() const =0;
+	T data;
+	node* next;
+	node(T elem):data(elem),next(NULL){}	
 };
 
-template <class T>
-struct Node
-{
-        T data;
-        Node* next;
-        Node(T val):data(val),next(NULL){}
-};
-
+// how to use allocator
+// also check for memory deallocation if done properly using valgrind
 template <class T>
 class stack:public stackADT<T>
 {
-        Node<T>* top;
-        int size;
-        public:
-        stack():top(NULL),size(0){}
-        ~stack();
-        void push(T val);
-        void pop() throw (stackEmptyException);
-        T Top() const throw (stackEmptyException);
-        int Size() const;
-        bool empty() const;
+	node<T>* _top = NULL;
+	int _size = 0; //how to use default values for variables 
+	public:
+	stack():_top(NULL),_size(0){}
+	~stack();
+	void push(T elem);
+	void pop() throw (stackEmptyException);
+	T top() const throw (stackEmptyException);
+	bool isEmpty() const;
+	int size() const;
 };
 
 template <class T>
-void stack<T>::push(T val)
+void stack<T>::push(T elem)
 {
-        Node<T>* ptr = new Node<T>(val);
-          ptr->next = top;
-        top = ptr;
-        size++;
+	node<T>* ptr = new node<T>(elem);
+	ptr->next = _top;
+	_top = ptr;
+	++_size; //use pre increment as post increment creates temp object
 }
 
 template <class T>
 void stack<T>::pop() throw (stackEmptyException)
 {
-        Node<T>* ptr = top;
-        if( !ptr)
-                throw stackEmptyException();
-        top = top->next;
-        delete ptr;
-        ptr = NULL;
-        size--;
+	if(!_top)
+		throw stackEmptyException();//anonymous object
+	node<T>* ptr = _top;
+	_top = _top->next;
+	delete ptr;
+	--_size;
+}
+//Partial template specialisation
+template <class T>
+T stack<T>::top() const throw (stackEmptyException)
+{
+	if(!_top)
+		throw stackEmptyException();
+	return _top->data;
 }
 
 template <class T>
-T stack<T>::Top() const throw (stackEmptyException)
+bool stack<T>::isEmpty() const
 {
-        if(!top)
-                throw stackEmptyException();
-        return top->data;
+	return _top?false:true;
 }
 
 template <class T>
-bool stack<T>::empty() const
+int stack<T>::size() const
 {
-        return top?false:true;
+	return _size;
 }
 
 template <class T>
-stack<T>::~stack()
+stack<T>::~stack() //can we make destructor const??
 {
-        while(top)
-        {
-                Node<T>* ptr = top;
-                top = top->next;
-                delete ptr;
-                ptr = NULL;
-        }
-        top = NULL;
-        size =0;
+	node<T>* ptr = _top;
+	while(ptr)
+	{
+		_top = _top->next;
+		delete ptr;
+		ptr = _top;
+	}
 }
-
-template <class T>
-int stack<T>::Size() const
-{
-        return size;
-}
-                                       
-                                                   

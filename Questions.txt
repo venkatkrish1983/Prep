@@ -1,0 +1,19 @@
+virtual
+access specifier
+throws
+User defined exceptions (no except)
+can we make constructor and destructor virtual
+char* 
+allocator
+nullptr vs NULL and where they are defined
+when to use dlopen
+new operator
+anonymous object
+partial template specialisation
+g++ flags and fPIC (position independent code
+what is virtual memory
+namespace
+iterators types and how to implement them
+hash is a predefined class  name in std namespace
+can struct have inheritance
+recursion
