@@ -87,7 +87,7 @@ void orgTree<T>::addElement(T mgr,T elem)
 template <class T>
 void orgTree<T>::deleteElement(T elem)
 {
-		
+		//how to handle delete of non leaf nodes
 
 }
 
