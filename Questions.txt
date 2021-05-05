@@ -1,6 +1,6 @@
 virtual
 access specifier
-throws
+throw
 User defined exceptions (no except)
 can we make constructor and destructor virtual
 char* 
